@@ -21,7 +21,6 @@ interface InputProps extends InputHTMLAttributes<HTMLAreaElement> {
 }
 
 const TextInput: React.FC<InputProps> = ({
-
   type,
   bsSize,
   invalid,
@@ -30,8 +29,7 @@ const TextInput: React.FC<InputProps> = ({
   error,
   disabled
 }) => {
-
-  console.log("error",error)
+  console.log(error)
   return (
     <React.Fragment>
       <div className="input-container">

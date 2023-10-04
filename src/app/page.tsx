@@ -1,11 +1,10 @@
-"use client"
-import { TextInput } from "./components/lib";
+import AddressForm from "./components/form";
+import "bootstrap/dist/css/bootstrap.min.css"
 
 export default function Home() {
   return (
     <main>
-      <h2>Hello world</h2>
-      <TextInput/>
+     <AddressForm/>
     </main>
   );
 }
