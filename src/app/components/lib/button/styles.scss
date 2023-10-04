@@ -1,0 +1,35 @@
+@import "../../styles/colors";
+.btn-container {
+  .btn {
+    border: 1px solid transparent;
+    font-size: 16px;
+    padding: 10px 30px;
+    font-weight: 400;
+    color: $onPrimary;
+    height: 50px;
+    &:hover {
+      transition: 0.7s;
+      background: $primary;
+      color: $onPrimary;
+    }
+    &:focus {
+      box-shadow: none !important;
+    }
+    span {
+      vertical-align: middle;
+    }
+
+    &.disabled {
+      background-color: $primaryVariant;
+    }
+    &.outline {
+      background: none;
+      color: $primary;
+      outline: 2px solid $primary;
+    }
+  }
+
+  .btn-primary {
+    background: $primary;
+  }
+}
