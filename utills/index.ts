@@ -1,11 +1,10 @@
-import axios from "axios"
+import axios from "axios";
 
 const axiosClient = axios.create({
-  baseURL: process.env.NEXT_PUBLIC_REST_API,
   headers: {
-    "auth-key":process.env.NEXT_PUBLIC_REST_API_KEY,
-  }
-})
+    "Access-Control-Allow-Origin": "*",
+    "auth-key": "872608e3-4530-4c6a-a369-052accb03ca8",
+  },
+});
 
-
-export default axiosClient
+export default axiosClient;

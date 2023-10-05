@@ -30,6 +30,7 @@ const TextInput: React.FC<InputProps> = ({
   disabled
 }) => {
   console.log(error)
+  console.log("field frominput",field)
   return (
     <React.Fragment>
       <div className="input-container">
