@@ -11,6 +11,7 @@ interface InputProps extends InputHTMLAttributes<HTMLAreaElement> {
   type?: ComponentProps<typeof Input>["type"]
   bsSize?: ComponentProps<typeof Input>["bsSize"]
   children?: React.ReactNode
+  name?:string
   valid?: ComponentProps<typeof Input>["valid"]
   invalid?: ComponentProps<typeof Input>["invalid"]
   placeholder?: ComponentProps<typeof Input>["placeholder"]
@@ -18,6 +19,7 @@ interface InputProps extends InputHTMLAttributes<HTMLAreaElement> {
   field?: ComponentProps<typeof Input>["field"]
   error?: ComponentProps<typeof Input>["error"]
   disabled?: ComponentProps<typeof Input>["disabled"]
+  setValue?:React.Dispatch<React.SetStateAction<number>>
 }
 
 const TextInput: React.FC<InputProps> = ({
@@ -27,7 +29,9 @@ const TextInput: React.FC<InputProps> = ({
   placeholder,
   field,
   error,
-  disabled
+  name,
+  disabled,
+  setValue
 }) => {
   console.log(error)
   console.log("field frominput",field)
@@ -41,7 +45,14 @@ const TextInput: React.FC<InputProps> = ({
           invalid={invalid}
           placeholder={placeholder}
           disabled={disabled}
+          name={name}
           {...field}
+          onChange={(e) => {
+            field.onChange(e);
+            // @ts-ignore
+            setValue?setValue(e.target.value):""; // Update the state with the input value
+          }}
+          
         />
       </div>
       <FormFeedback>{error}</FormFeedback>
