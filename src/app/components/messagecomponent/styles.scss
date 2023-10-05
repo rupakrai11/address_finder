@@ -1,0 +1,17 @@
+@import "../styles/colors";
+.messageContainer {
+  // background: $onBackground;
+  padding: 4px;
+  border-radius: 8px;
+  display: flex;
+  justify-content: center;
+  align-items: left;
+  margin: 2px 0px;
+  &_error {
+    color: $error;
+  }
+  &_success {
+    color: $success;
+  }
+  
+}

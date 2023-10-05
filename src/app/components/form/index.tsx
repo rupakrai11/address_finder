@@ -8,22 +8,20 @@ import * as Yup from "yup";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { AddressInfo } from "@/types";
 import { useEffect, useState } from "react";
-import Image from "next/image";
-import Spinner from "../../../assets/spinner.svg";
 import axiosClient from "../../../../utills";
-import PostalMessageContainer from "../messagecomponent";
+import PostalMessageContainer from "../messagecomponent/postalError";
 import StateErrorMessageContainer from "../messagecomponent/stateError";
 import SuccessMessageContainer from "../messagecomponent/success";
+import { checkStateExist } from "../../../../utills/helpers";
 import "./styles.scss";
+
 
 interface InfoType {
   postal: number;
   suburb: string;
   state: string;
 }
-interface length {
-  length: number;
-}
+
 
 interface UseInfoType {
   message: string;
@@ -48,41 +46,36 @@ const AddressForm = () => {
     messagetype: "",
   });
 
-
   // validataion schema
   const AddressFormSchema = Yup.object().shape({
     postcode: Yup.number().required("Postcode is requried"),
     state: Yup.string().required("State is requried"),
-    suburb: Yup.string().required("Please select a gender"),
-    // contactNumber: Yup.string().max("Message is requried")
+    suburb: Yup.string().required("Suburb is required "),
   });
-// api request
-  useEffect(() => {
+  // api request
+  const getDetails = async (q: string) => {
+    const response = await axiosClient.get(
+      `/api/postcode/search.json?q=${postCode}`
+    );
     // @ts-ignore
-    if (postCode !== 0 && postCode.length > 3) {
-      axiosClient
-        .get(`/api/postcode/search.json?q=${postCode}`)
-        .then(function (response) {
-          // @ts-ignore
-          if (response && response.data.localities) {
-            const resData: InfoType[] = response.data?.localities?.locality.map(
-              (item: any) => {
-                return {
-                  postal: item.postcode,
-                  suburb: item.location,
-                  state: item.state,
-                };
-              }
-            );
-            setAddressinfo(resData);
-          }
+    if (response && response.data.localities) {
+      const resData: InfoType[] = response.data?.localities?.locality.map(
+        (item: any) => {
+          return {
+            postal: item.postcode,
+            suburb: item.location,
+            state: item.state,
+          };
+        }
+      );
+      setAddressinfo(resData);
+    }
+  };
 
-          // handle success
-        })
-        .catch(function (error) {
-          // handle error
-          console.log(error);
-        });
+  useEffect(() => {
+    const p = String(postCode);
+    if (postCode !== 0 && p.length > 3) {
+      getDetails(p);
     }
   }, [postCode]);
 
@@ -90,17 +83,28 @@ const AddressForm = () => {
     control,
     handleSubmit,
     reset,
-    setValue,
-    watch,
-    formState: { errors },
+    formState: { errors,isDirty,isValid },
   } = useForm<AddressInfo>({
     // @ts-ignore
     resolver: yupResolver(AddressFormSchema),
   });
-
+const resetMessage=()=>{
+  setPostalErrorrMessage({
+    message: "",
+    messagetype: "",
+  });
+  setStateErrorrMessage({
+    message: "",
+    messagetype: "",
+  });
+  setSuccessMessage({
+    message: "",
+    messagetype: "",
+  });
+}
   // user form submit
   const handleAddressSubmit = async (data: AddressInfo) => {
-    // setLoading(true);
+    resetMessage()
     // match suburb with postal
     const suburbMatchWithPostal = addressinfo.find(
       (item) =>
@@ -114,22 +118,23 @@ const AddressForm = () => {
       });
     }
     // match satate with surburb
-    const stateMatchesWithSuburb = addressinfo.find(
-      (item) =>
+    const stateMatchesWithSuburb = addressinfo.find((item) => {
+      return (
         item.suburb.toLowerCase() === data.suburb.toLowerCase() &&
-        item.state.toLowerCase() === data.state.toLowerCase()
-    );
+        checkStateExist(data.state, [item.state])
+      );
+    });
     if (!stateMatchesWithSuburb)
       setStateErrorrMessage({
         message: `The suburb ${data.suburb} does not exist in the state ${data.state}.`,
         messagetype: "error",
       });
-      // is success
+    // is success
     const isSuccess = addressinfo.find(
       (item) =>
         item.postal === data.postcode &&
         item.suburb.toLowerCase() === data.suburb.toLowerCase() &&
-        item.state.toLowerCase() === data.state.toLowerCase()
+        checkStateExist(data.state, [item.state])
     );
     if (isSuccess) {
       setSuccessMessage({
@@ -137,13 +142,11 @@ const AddressForm = () => {
         messagetype: "success",
       });
     }
-  };
-
-  const handleWatch = () => {
-    if (watch("postcode") && watch("state") && watch("suburb")) {
-      return false;
-    }
-    return true;
+    reset({
+      postcode:0,
+      state:"",
+      suburb:""
+    })
   };
 
   return (
@@ -159,7 +162,7 @@ const AddressForm = () => {
                 userInfoMessage={stateErrorrMessage}
               />
             )}
-            {successMessage && (
+            {successMessage.message && (
               <SuccessMessageContainer userInfoMessage={successMessage} />
             )}
 
@@ -176,6 +179,7 @@ const AddressForm = () => {
                     <TextInput
                       id="postcode"
                       name="postcode"
+                      type="number"
                       placeholder="Enter your postcode "
                       error={errors?.postcode?.message}
                       invalid={errors.postcode && true}
@@ -194,8 +198,8 @@ const AddressForm = () => {
                     id="suburb"
                     name="suburb"
                     placeholder="Enter your suburb "
-                    error={errors?.state?.message}
-                    invalid={errors.state && true}
+                    error={errors?.suburb?.message}
+                    invalid={errors.suburb && true}
                     field={field}
                   />
                 )}
@@ -215,19 +219,7 @@ const AddressForm = () => {
                   />
                 )}
               />
-              <CustomButton
-                classname={`${
-                  !handleWatch() ? "btn-primary" : "disabled"
-                }`}
-                disabled={loading}
-                // onClick={onReset}
-              >
-                {loading ? (
-                  <Image src={Spinner} className="loading" alt="spinner" />
-                ) : (
-                  "Submit"
-                )}
-              </CustomButton>
+              <CustomButton classname={"btn-primary"} disabled={!isDirty || !isValid}>Submit</CustomButton>
             </Form>
           </Col>
         </Row>
