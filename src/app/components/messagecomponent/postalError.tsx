@@ -1,6 +1,6 @@
 "use client";
 import React from "react";
-import "./styles.scss"
+import "./styles.scss";
 interface userInfoMessage {
   message: string;
   messagetype: string;
@@ -13,9 +13,9 @@ interface UseInfoTypeInfo {
 const PostalMessageContainer = ({ userInfoMessage }: UseInfoTypeInfo) => {
   // const {message,messagetype}=InfoMessage
   return (
-  <div className={`messageContainer ${userInfoMessage.messagetype}`}>
-    <p className="messageContainer_error">{userInfoMessage?.message}</p>
-  </div>
+    <div className={`messageContainer ${userInfoMessage.messagetype}`}>
+      <p className="messageContainer_error">{userInfoMessage?.message}</p>
+    </div>
   );
 };
 
