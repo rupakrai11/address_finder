@@ -4,7 +4,7 @@ const nextConfig = {
     return [
       {
         source: "/api/:path*",
-        destination: "https://digitalapi.auspost.com.au/:path*", // Proxy to Backend
+        destination: process.env.NEXT_PUBLIC_REST_API, // Proxy to Backend
       },
     ];
   },
